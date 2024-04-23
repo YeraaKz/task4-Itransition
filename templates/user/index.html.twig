@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User List{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+{% endblock %}
+
+{% block body %}
+
+    <h2>User List</h2>
+
+    <div class="d-flex justify-content-center">
+        <button class="btn mr-5 btn-danger" onclick="updateUserStatus('deleted')">Delete Selected</button>
+        <button class="btn mr-5 btn-warning" onclick="updateUserStatus('blocked')">Block Selected</button>
+        <button class="btn btn-success" onclick="updateUserStatus('unblocked')">Unblock Selected</button>
+    </div>
+
+    <div class="container mt-4">
+        <h2>User List</h2>
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+            <tr>
+                <th><input type="checkbox" onclick="selectAll(this)"></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Registration Date</th>
+                <th>Last Login Date</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td><input type="checkbox" name="selectedUsers" class="user-checkbox" value="{{ user.id }}"></td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.registrationDate|date('Y-m-d') }}</td>
+                    <td>{{ user.lastLoginDate|date('Y-m-d H:i') }}</td>
+                    <td>{{ user.status }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function selectAll(source) {
+            checkboxes = document.querySelectorAll('input[name="selectedUsers"]');
+            checkboxes.forEach(checkbox => checkbox.checked = source.checked);
+        }
+
+        function updateUserStatus(status) {
+            const selectedIds = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
+            console.log(status);
+            fetch('/users/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token('update_user_status') }}'
+                },
+                body: JSON.stringify({ ids: selectedIds, status: status })
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to update users.');
+                }
+            });
+        }
+    </script>
+{% endblock %}
+
