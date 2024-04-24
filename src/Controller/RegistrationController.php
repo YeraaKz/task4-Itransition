@@ -29,11 +29,15 @@ class RegistrationController extends AbstractController
                 )
             );
 
+            date_default_timezone_set('Europe/Berlin');
+
+            $user->setLastLoginDate(new \DateTime());
+            $user->setRegistrationDate(new \DateTime());
+
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // do anything else you need here, like send an email
-
+            $request->getSession()->invalidate();
             return $this->redirectToRoute('user_index');
         }
 
