@@ -5,17 +5,27 @@ namespace App\Controller;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class UserController extends AbstractController
 {
     #[Route('/users', name: 'user_index')]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(EntityManagerInterface $entityManager, Security $security): Response
     {
-        // TODO: показывает неправильно DateTime ласт логина и регистраций
+        if (!$security->isGranted('USER_ACCESS')) {
+            $this->addFlash('error', 'You are blocked');
+
+            return $this->redirectToRoute('app_login');
+        }
+
         $users = $entityManager->getRepository(User::class)->findAll();
 
         return $this->render('user/index.html.twig', [
@@ -24,7 +34,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/update', name: 'users_update', methods: ['POST'])]
-    public function updateUsersStatus(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function updateUsersStatus(Request $request, EntityManagerInterface $entityManager, TokenStorageInterface $tokenStorage, SessionInterface $session): JsonResponse
     {
 
         $data = json_decode($request->getContent(), true);
@@ -35,19 +45,17 @@ class UserController extends AbstractController
 
         $users = $entityManager->getRepository(User::class)->findBy(['id' => $userIds]);
 
-        $currentUser = $this->getUser();
         foreach ($users as $user) {
+            $user->setStatus($status);
 
-            if ($status === 'deleted') {
+            if ($status === 'deleted' && $this->getUser() == $user) {
+                if($this->getUser() == $user){
+                    $session->invalidate();
+                    $tokenStorage->setToken(null);
+                }
+
                 $entityManager->remove($user);
-            }
-            else if($status === 'unblocked'){
-                $user->setStatus('active');
-                $user->setRoles(['ROLE_USER']);
-            }
-            else{
-                $user->setStatus($status);
-                $user->setRoles([]);
+                $entityManager->flush();
             }
         }
 
