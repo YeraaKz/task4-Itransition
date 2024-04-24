@@ -48,7 +48,7 @@ class UserController extends AbstractController
         foreach ($users as $user) {
             $user->setStatus($status);
 
-            if ($status === 'deleted' && $this->getUser() == $user) {
+            if ($status === 'deleted') {
                 if($this->getUser() == $user){
                     $session->invalidate();
                     $tokenStorage->setToken(null);
