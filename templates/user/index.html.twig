@@ -8,16 +8,15 @@
 
 {% block body %}
 
-    <h2>User List</h2>
 
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center mt-5">
         <button class="btn mr-5 btn-danger" onclick="updateUserStatus('deleted')">Delete Selected</button>
         <button class="btn mr-5 btn-warning" onclick="updateUserStatus('blocked')">Block Selected</button>
-        <button class="btn btn-success" onclick="updateUserStatus('unblocked')">Unblock Selected</button>
+        <button class="btn btn-success" onclick="updateUserStatus('active')">Unblock Selected</button>
     </div>
 
     <div class="container mt-4">
-        <h2>User List</h2>
+        <h2 class="text-center">User List</h2>
         <table class="table table-bordered">
             <thead class="thead-dark">
             <tr>
@@ -35,8 +34,8 @@
                     <td><input type="checkbox" name="selectedUsers" class="user-checkbox" value="{{ user.id }}"></td>
                     <td>{{ user.name }}</td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.registrationDate|date('Y-m-d') }}</td>
-                    <td>{{ user.lastLoginDate|date('Y-m-d H:i') }}</td>
+                    <td>{{ user.registrationDate|date('y-M-dd H:i') }}</td>
+                    <td>{{ user.lastLoginDate|date('y-M-dd H:i') }}</td>
                     <td>{{ user.status }}</td>
                 </tr>
             {% endfor %}
