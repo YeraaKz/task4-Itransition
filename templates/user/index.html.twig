@@ -4,6 +4,7 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 {% endblock %}
 
 {% block body %}
@@ -25,9 +26,15 @@
     </nav>
 
     <div class="d-flex justify-content-center mt-5">
-        <button class="btn mr-5 btn-danger" onclick="updateUserStatus('deleted')">Delete Selected</button>
-        <button class="btn mr-5 btn-warning" onclick="updateUserStatus('blocked')">Block Selected</button>
-        <button class="btn btn-success" onclick="updateUserStatus('active')">Unblock Selected</button>
+        <button class="btn mr-5 btn-danger" onclick="updateUserStatus('deleted')">
+            <i class="fas fa fa-trash-alt"></i>
+        </button>
+        <button class="btn mr-5 btn-warning" onclick="updateUserStatus('blocked')">
+            <i class="fas fa-ban"></i>
+        </button>
+        <button class="btn btn-success" onclick="updateUserStatus('active')">
+            <i class="fas fa-unlock-alt"></i>
+        </button>
     </div>
 
     <div class="container mt-4">
